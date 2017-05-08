@@ -1,47 +1,36 @@
-const Project = require('../models/projectModel')
-const Event = require('../models/eventModel')
-const Attachment = require('../models/attachmentModel')
-const _ = require('lodash');
+const Projects = require('../data/projects')
+const Events = require('../data/events')
+const _ = require('lodash')
+const Promise = require('bluebird')
 
 exports.params = (req, res, next, name) => {
-  Project.findOne({name: name})
-    .populate({
-      path: 'events',
-      populate: { path: 'attachments' }
-    })
-    .exec()
-    .then(function(project) {
-      if (!project) {
-        next(new Error('Can not find project with given id'));
-      } else {
-        req.project = project
-        next()
-      }
-      return null
-    })
-    .catch((err) => {
-      next(err);
-    });
+  let project = _.find(Projects, {name: name})
+  
+  _.forEach(project.events, (event_id) => {
+    let event = _.find(Events, {_id: event_id})
+    let index = _.indexOf(project.events, event_id)
+    project.events[index] = event
+  });
+  
+  if (!project) {
+    next(new Error('Can not find project with given id'));
+  } else {
+    req.project = project
+    next()
+  }
 };
 
 exports.get = (req, res, next) => {
-  Project.find({})
-    .then(function(projects){
-      res.json(projects);
-    }, function(err){
-      next(err);
-    });
+  let projects = Projects
+  res.json(projects)
 };
 
 exports.post = (req, res, next) => {
   var newProject = req.body;
-
-  Project.create(newProject)
-    .then((project) => {
-      res.json(project)
-    }, (err) => {
-      next(err)
-    })
+  newProject.events = []
+  newProject._id = Math.floor(Math.random() * 10000000)
+  Projects.push(newProject)
+  res.json(Projects)
 }
 
 exports.getOne = function(req, res, next) {

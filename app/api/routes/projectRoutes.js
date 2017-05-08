@@ -10,5 +10,4 @@ router.route('/')
 router.route('/:name')
   .get(controller.getOne)
 
-
 module.exports = router;
