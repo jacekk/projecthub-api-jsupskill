@@ -5,11 +5,13 @@ const Promise = require('bluebird')
 
 exports.params = (req, res, next, name) => {
   let project = _.find(Projects, {name: name})
-  
+
   _.forEach(project.events, (event_id) => {
-    let event = _.find(Events, {_id: event_id})
-    let index = _.indexOf(project.events, event_id)
-    project.events[index] = event
+    if (typeof event_id === 'number') {
+      let event = _.find(Events, {_id: event_id})
+      let index = _.indexOf(project.events, event_id)
+      project.events[index] = event
+    }
   });
   
   if (!project) {
