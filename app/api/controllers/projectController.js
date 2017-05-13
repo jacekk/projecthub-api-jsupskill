@@ -10,12 +10,13 @@ exports.params = (req, res, next, name) => {
   const project = _.cloneDeep(
     Projects.filter(item => item.name === name)[0]
   )
-
-  project.events = project.events.map(mapEventIdToEvent)
   
   if (!project) {
-    next(new Error('Can not find project with given id'));
+    const msg = 'Can not find project with given id.'
+    res.status(404).send(msg)
+    throw new Error(msg);
   } else {
+    project.events = project.events.map(mapEventIdToEvent)
     req.project = project
     next()
   }
