@@ -2,12 +2,10 @@ const Projects = require('../data/projects')
 const Events = require('../data/events')
 const _ = require('lodash')
 
-const mapEventIdToEvent = id => _.cloneDeep(
-  Events.filter(item => item._id === id)[0]
-)
+const mapEventIdToEvent = id => Events.filter(item => item._id === id)[0]
 
 exports.params = (req, res, next, name) => {
-  const project = _.cloneDeep(
+  const project = _.cloneDeep( // to remove reference
     Projects.filter(item => item.name === name)[0]
   )
   
