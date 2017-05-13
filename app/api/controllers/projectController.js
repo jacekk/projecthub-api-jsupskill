@@ -1,18 +1,17 @@
 const Projects = require('../data/projects')
 const Events = require('../data/events')
 const _ = require('lodash')
-const Promise = require('bluebird')
+
+const mapEventIdToEvent = id => _.cloneDeep(
+  Events.filter(item => item._id === id)[0]
+)
 
 exports.params = (req, res, next, name) => {
-  let project = _.find(Projects, {name: name})
+  const project = _.cloneDeep(
+    Projects.filter(item => item.name === name)[0]
+  )
 
-  _.forEach(project.events, (event_id) => {
-    if (typeof event_id === 'number') {
-      let event = _.find(Events, {_id: event_id})
-      let index = _.indexOf(project.events, event_id)
-      project.events[index] = event
-    }
-  });
+  project.events = project.events.map(mapEventIdToEvent)
   
   if (!project) {
     next(new Error('Can not find project with given id'));
